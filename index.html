@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Scraper</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        input[type="text"] {
+            width: 300px;
+            padding: 10px;
+            margin-right: 10px;
+        }
+        button {
+            padding: 10px 15px;
+        }
+        pre {
+            white-space: pre-wrap;
+            background: #f4f4f4;
+            padding: 10px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Web Scraper</h1>
+    <input type="text" id="urlInput" placeholder="Enter URL to scrape">
+    <button id="scrapeButton">Scrape</button>
+    <h2>Scraped Content:</h2>
+    <pre id="result"></pre>
+
+    <script>
+        document.getElementById('scrapeButton').onclick = async () => {
+            const urlInput = document.getElementById('urlInput').value.trim();
+            
+            // Validate URL input
+            if (!urlInput.startsWith('http://') && !urlInput.startsWith('https://')) {
+                alert('Please enter a valid URL starting with http:// or https://');
+                return;
+            }
+
+            const response = await fetch('/scrape', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ url: urlInput })
+            });
+
+            const result = await response.json();
+            const resultContainer = document.getElementById('result');
+            if (result.success) {
+                resultContainer.textContent = result.content;
+            } else {
+                resultContainer.textContent = result.message;
+            }
+        };
+    </script>
+</body>
+</html>

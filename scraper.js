@@ -1,5 +1,6 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
+const readline = require('readline');
 
 // Function to fetch robots.txt
 async function fetchRobotsTxt(url) {
@@ -69,18 +70,35 @@ async function scrapePage(url) {
     }
 }
 
-// Handling form submission
-document.getElementById('urlForm').addEventListener('submit', async (event) => {
-    event.preventDefault();
-    
-    const urlInput = document.getElementById('urlInput').value;
-    
-    const allowed = await isScrapingAllowed(urlInput, '*');
-    
-    if (allowed) {
-        const scrapedContent = await scrapePage(urlInput);
-        document.getElementById('result').innerText = scrapedContent || 'No content found.';
-    } else {
-        document.getElementById('result').innerText = 'Scraping not allowed for this URL.';
-    }
-});
+// CLI setup using readline for user input
+function startCli() {
+    const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout
+    });
+
+    rl.question('Enter the URL to scrape: ', async (urlInput) => {
+        const allowed = await isScrapingAllowed(urlInput, '*');
+        
+        if (allowed) {
+            const scrapedContent = await scrapePage(urlInput);
+            console.log(scrapedContent || 'No content found.');
+        } else {
+            console.log('Scraping not allowed for this URL.');
+        }
+        
+        rl.close();
+    });
+}
+
+// Export the scraping functions for web usage
+module.exports = {
+    isScrapingAllowed,
+    scrapePage,
+    startCli
+};
+
+// If this file is executed directly, start the CLI
+if (require.main === module) {
+    startCli();
+}
